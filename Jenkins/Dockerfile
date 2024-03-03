@@ -14,5 +14,11 @@ RUN curl -fsSLO https://download.docker.com/linux/static/stable/x86_64/docker-20
 RUN curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" \
     && install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
 
+# Installation de Helm
+RUN curl -fsSLO https://get.helm.sh/helm-v3.5.4-linux-amd64.tar.gz \
+    && tar -zxvf helm-v3.5.4-linux-amd64.tar.gz \
+    && mv linux-amd64/helm /usr/local/bin/helm \
+    && rm -rf helm-v3.5.4-linux-amd64.tar.gz linux-amd64
+
 # Utilisation de jenkins-plugin-cli pour installer les plugins Jenkins
 # RUN jenkins-plugin-cli --plugins docker-workflow kubernetes git blueocean

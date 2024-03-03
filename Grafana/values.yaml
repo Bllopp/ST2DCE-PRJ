@@ -1,0 +1,28 @@
+datasources:
+  datasources.yaml:
+    apiVersion: 1
+    datasources:
+      - name: Prometheus
+        type: prometheus
+        url: http://prometheus-server.prometheus.svc.cluster.local
+        access: proxy
+        isDefault: true
+
+adminUser: admin
+adminPassword: "grafanaAdminPassword"
+
+dashboards:
+  default:
+    k8s-cluster:
+      gnetId: 6417
+      revision: 1
+      datasource: Prometheus
+
+persistence:
+  enabled: true
+  type: pvc
+  size: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  finalizers:
+    - kubernetes.io/pvc-protection

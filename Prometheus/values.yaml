@@ -1,22 +1,35 @@
 alertmanager:
   enabled: true
+  config:
+    global:
+      resolve_timeout: 5m
+    route:
+      group_by: ['alertname']
+      group_wait: 10s
+      group_interval: 10s
+      repeat_interval: 1h
+      receiver: 'null'
+      routes:
+        - match:
+            alertname: Watchdog
+          receiver: 'null'
+    receivers:
+      - name: 'null'
 
 server:
+  enabled: true
   global:
-    scrape_interval: 15s  # Scrape targets every 15 seconds
-  extraScrapeConfigs: |
-    - job_name: 'kubernetes-pods'
-      kubernetes_sd_configs:
-      - role: pod
+    scrape_interval: 15s
 
-  alertingRules:
-    groups:
-      - name: example
-        rules:
-          - alert: HighMemoryUsage
-            expr: node_memory_Active_bytes / node_memory_MemTotal_bytes > 0.8
-            for: 5m
-            labels:
-              severity: warning
-            annotations:
-              summary: High memory usage detected
+  additionalScrapeConfigs:
+    - job_name: 'kubernetes-apiservers'
+      kubernetes_sd_configs:
+        - role: endpoints
+      scheme: https
+      tls_config:
+        ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+      bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+      relabel_configs:
+        - source_labels: [__meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name]
+          action: keep
+          regex: default;kubernetes;https
